@@ -1,3 +1,5 @@
+0.2.1:
+ - Add Memcached as a service.
 0.2.0:
  - Separate internal and user configs.
  - Services can have user defined names.

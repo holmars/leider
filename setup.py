@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='leider',
-    version='0.2.0',
+    version='0.2.1',
     description='Manages services in Docker for all your local apps.',
     author='Hólmar Sigmundsson',
     author_email='holmars@gmail.com',

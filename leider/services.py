@@ -133,6 +133,28 @@ class Redis(Service):
         )
 
 
+class Memcached(Service):
+    internal_port = 11211
+
+    def __init__(self, name, image, config):
+        super(Memcached, self).__init__(name, image, config)
+
+    def run(self):
+        container = client.containers.run(
+            image=self.image,
+            detach=True,
+            publish_all_ports=True,
+        )
+        return container
+
+    @property
+    def url(self):
+        return 'memcached://{host}:{port}'.format(
+            host=self.host,
+            port=self.port,
+        )
+
+
 class RabbitMQ(Service):
     internal_port = 5672
 
@@ -173,5 +195,6 @@ class RabbitMQ(Service):
 SERVICES = {
     'postgres': PostgreSQL,
     'redis': Redis,
+    'memcached': Memcached,
     'rabbitmq': RabbitMQ,
 }

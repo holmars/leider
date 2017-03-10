@@ -14,16 +14,16 @@ def get_service(service_name):
 class Service(object):
     internal_port = None
 
-    def __init__(self, hostname, image, config):
+    def __init__(self, name, image, config):
         super(Service, self).__init__()
         self._container = None
         self._attrs = None
         self._port = None
         self._short_id = None
-        self._name = None
 
+        self.name = name
         self.id = config.get('id', None)
-        self.host = hostname
+        self.host = 'localhost'
         self.image = image
 
     @property
@@ -45,24 +45,13 @@ class Service(object):
         return self._port
 
     @property
-    def short_id(self):
-        if self._short_id is None:
-            self._short_id = self.container.short_id
-        return self._short_id
-
-    @property
-    def name(self):
-        if self._name is None:
-            self._name = self.container.name
-        return self._name
-
-    @property
     def status(self):
         if self.container:
             return self.container.status
+        return 'does not exist'
 
     def config_fields(self):
-        return ('image', 'id', 'short_id', 'name', 'host', 'port')
+        return ('image', 'id', 'host', 'port')
 
     def up(self):
         container = self.container
@@ -82,8 +71,8 @@ class Service(object):
 class PostgreSQL(Service):
     internal_port = 5432
 
-    def __init__(self, hostname, image, config):
-        super(PostgreSQL, self).__init__(hostname, image, config)
+    def __init__(self, name, image, config):
+        super(PostgreSQL, self).__init__(name, image, config)
         self.db_name = config.get('db_name', os.getcwd().split(os.sep)[-1])
         self.db_user = config.get('db_user', self.db_name)
         self.db_pass = config.get('db_pass', os.urandom(8).encode('hex'))
@@ -119,8 +108,8 @@ class PostgreSQL(Service):
 class Redis(Service):
     internal_port = 6379
 
-    def __init__(self, hostname, image, config):
-        super(Redis, self).__init__(hostname, image, config)
+    def __init__(self, name, image, config):
+        super(Redis, self).__init__(name, image, config)
         self.redis_db = config.get('redis_db', 0)
 
     def config_fields(self):
@@ -147,8 +136,8 @@ class Redis(Service):
 class RabbitMQ(Service):
     internal_port = 5672
 
-    def __init__(self, hostname, image, config):
-        super(RabbitMQ, self).__init__(hostname, image, config)
+    def __init__(self, name, image, config):
+        super(RabbitMQ, self).__init__(name, image, config)
         self.queue_vhost = config.get('queue_vhost', os.getcwd().split(os.sep)[-1])
         self.queue_user = config.get('queue_user', self.queue_vhost)
         self.queue_pass = config.get('queue_pass', os.urandom(8).encode('hex'))

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import click
 
-from .config import Config
-from .docker_utils import get_image
+from .config import Config, InternalConfig
+from .cli_utils import parse_image
 from .services import get_service
 
 
@@ -15,49 +15,75 @@ def cli():
     pass
 
 
-@cli.command()
-@click.argument('services', nargs=-1)
-def up(services):
-    config = Config.read()
-    services_info = {}
-    services = services or config.sections()
-    for service_name in services:
-        service_conf = {}
-        if config.has_section(service_name):
-            service_conf = dict(config.items(service_name))
-        image = service_conf.get('image', get_image(service_name))
-        service = get_service(service_name)('localhost', image, service_conf)
+@click.command(help='Starts all or provided services. Prints out connection URLs.')
+@click.argument('service_names', nargs=-1)
+def up(service_names):
+    internal_config = InternalConfig()
+    config = Config()
+    service_names = service_names or config.all()
+    for service_name in service_names:
+        if not config.has(service_name):
+            click.echo("'{service_name}' does not exist in 'leider.yaml'.".format(
+                service_name=service_name))
+            continue
+        service_conf = config.get(service_name)
+        image = service_conf.get('image')
+        if image is None:
+            click.echo("'{service_name}' does not have an image.".format(service_name=service_name))
+            continue
+        service_type, image = parse_image(image)
+        service_int_conf = internal_config.get(service_name)
+        service = get_service(service_type)(service_name, image, service_int_conf)
         service.up()
-        click.echo('{}: {}'.format(service_name, service.url))
-        services_info[service_name] = service
-    if services_info:
-        Config.write(services_info)
+        click.echo('{}: {}'.format(service.name, service.url))
+        internal_config.add_or_update(service)
 
 
-@cli.command()
-@click.argument('services', nargs=-1)
-def down(services):
-    config = Config.read()
-    services_info = {}
-    services = services or config.sections()
-    for service_name in services:
-        section = {}
-        if config.has_section(service_name):
-            section = dict(config.items(service_name))
-        image = section.get('image')
-        service = get_service(service_name)('localhost', image, section)
+@click.command(help='Stops all or provided services.')
+@click.argument('service_names', nargs=-1)
+def down(service_names):
+    internal_config = InternalConfig()
+    config = Config()
+    service_names = service_names or config.all()
+    for service_name in service_names:
+        if not config.has(service_name):
+            click.echo("'{service_name}' does not exist in 'leider.yaml'.".format(
+                service_name=service_name))
+            continue
+        service_conf = config.get(service_name)
+        image = service_conf.get('image')
+        if image is None:
+            click.echo("'{service_name}' does not have an image.".format(service_name=service_name))
+            continue
+        service_type, image = parse_image(image)
+        service_int_conf = internal_config.get(service_name)
+        service = get_service(service_type)(service_name, image, service_int_conf)
         service.down()
         click.echo('{}: {}'.format(service_name, service.status))
-        services_info[service_name] = service
-    if services_info:
-        Config.write(services_info)
+        internal_config.add_or_update(service)
 
 
-@cli.command()
+@click.command(help='Prints out the status of all services.')
 def status():
-    config = Config.read()
-    for service_name in config.sections():
-        section = dict(config.items(service_name))
-        image = section.get('image')
-        service = get_service(service_name)('localhost', image, section)
+    internal_config = InternalConfig()
+    config = Config()
+    service_names = config.all()
+    for service_name in service_names:
+        if not config.has(service_name):
+            click.echo("'{service_name}' does not exist in 'leider.yaml'.".format(
+                service_name=service_name))
+            continue
+        service_conf = config.get(service_name)
+        image = service_conf.get('image')
+        if image is None:
+            click.echo("'{service_name}' does not have an image.".format(service_name=service_name))
+            continue
+        service_type, image = parse_image(image)
+        service_int_conf = internal_config.get(service_name)
+        service = get_service(service_type)(service_name, image, service_int_conf)
         click.echo('{}: {}'.format(service_name, service.status))
+
+
+cli.add_command(up)
+cli.add_command(down)
+cli.add_command(status)

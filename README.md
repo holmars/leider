@@ -1,71 +1,80 @@
 # Leider
 
-A cli to manage services for apps in docker for local development.
+A cli to manage services for apps in `Docker` for local development.
 
-## Services
+### Services
 
-PostgreSQL, Redis and RabbitMQ.
+**PostgreSQL**, **Redis** and **RabbitMQ**.
 
-## Workflow
+### Features
+
+- Manages services in `Docker`.
+- Exports connection URLs for your app.
+
+## Installation
 
 ```
-leider up [<service>[:<version>] ...]
-leider down [<service>[:<version>] ...]
-leider status
+$ pip install leider
 ```
+
+or
+
+```
+$ pipsi install leider
+```
+
+## Usage
+
+Create a `leider.yaml` in your app home. Example:
+
+```
+$ cat leider.yaml
+db:
+  image: postgres:9.6-alpine
+cache:
+  image: redis:3.0-alpine
+queue:
+  image: rabbitmq:3-alpine
+```
+
+Now you can start using the `Leider` cli.
+
+```
+$ leider
+Usage: leider [OPTIONS] COMMAND [ARGS]...
+
+  Leider manages services in Docker for all your local apps.
+
+Options:
+  --version  Show the version and exit.
+  --help     Show this message and exit.
+
+Commands:
+  down    Stops all or provided services.
+  status  Prints out the status of all services.
+  up      Starts all or provided services.
+```
+
 
 ### Examples
 
 ```
-$ leider up postgres redis rabbitmq
-postgres: postgresql://my-app:f1783734bc641e80@localhost:32804/my-app
-redis: redis://localhost:32805/0
-rabbitmq: amqp://my-app:6b9fe90f0ad45f1c@localhost:32801/my-app
+$ leider up db cache queue
+db: postgresql://leider-test:55df62e4e40da94a@localhost:32818/leider-test
+cache: redis://localhost:32819/0
+queue: amqp://leider-test:a212aa7457bfdcb4@localhost:32821/leider-test
 
 $ leider status
-redis: running
-postgres: running
-rabbitmq: running
+db: running
+cache: running
+queue: running
 
 $ leider down
-redis: exited
-postgres: exited
-rabbitmq: exited
+db: exited
+cache: exited
+queue: exited
 ```
 
-Uses a config file to keep track of the containers.
+### Advanced
 
-```
-$ cat my-app.cfg
-[redis]
-image = redis:3.0-alpine
-id = 743d3fbb3cf3072bed42efd75b594004067c18a4697a3c0c13dd766c9454916b
-short_id = 743d3fbb3c
-name = infallible_davinci
-host = localhost
-port = 32805
-redis_db = 0
-
-[postgres]
-image = postgres:9.6-alpine
-id = 25d4085ca3b6843e37cfba96dd2cf85eabc3daefc6a163099881615109b35c75
-short_id = 25d4085ca3
-name = stoic_lumiere
-host = localhost
-port = 32804
-db_name = my-app
-db_user = my-app
-db_pass = fc1ad03dfc37342c
-
-[rabbitmq]
-image = rabbitmq:3-alpine
-id = 3baf171d2f10a27e8b8828fe621c5f364bf7d0a7846a832665985555a991002d
-short_id = 3baf171d2f
-name = condescending_bardeen
-host = localhost
-port = 32801
-queue_vhost = my-app
-queue_user = my-app
-queue_pass = 4fdbf5c41e52eb90
-
-```
+`Leider` keeps track of the `Docker` containers by storing a `yaml` file for each app in `~/.leider`.

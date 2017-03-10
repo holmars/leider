@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='leider',
-    version='0.1',
+    version='0.2.0',
     description='Manages services in Docker for all your local apps.',
     author='Hólmar Sigmundsson',
     author_email='holmars@gmail.com',
@@ -16,6 +16,7 @@ setup(
     install_requires=[
         'click',
         'docker',
+        'ruamel.yaml',
     ],
     license='MIT',
     classifiers=[

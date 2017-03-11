@@ -4,7 +4,7 @@ A cli to manage services for apps in `Docker` for local development.
 
 ### Services
 
-**PostgreSQL**, **Redis** and **RabbitMQ**.
+**PostgreSQL**, **Redis**, **Memcached** and **RabbitMQ**.
 
 ### Features
 

@@ -4,13 +4,6 @@ import os
 from .docker_utils import client, get_exposed_port
 
 
-def get_service(service_name):
-    try:
-        return SERVICES[service_name]
-    except KeyError:
-        return None
-
-
 class Service(object):
     internal_port = None
 
@@ -192,7 +185,7 @@ class RabbitMQ(Service):
         )
 
 
-SERVICES = {
+ServiceTypes = {
     'postgres': PostgreSQL,
     'redis': Redis,
     'memcached': Memcached,

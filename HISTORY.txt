@@ -1,3 +1,5 @@
+0.2.2:
+ - Better error handling of config and inputs.
 0.2.1:
  - Add Memcached as a service.
 0.2.0:

@@ -78,7 +78,7 @@ class Config(object):
     filename = 'leider.yaml'
 
     def __init__(self):
-        self.config = self._read()
+        super(Config, self).__init__()
 
     def _read(self):
         with codecs.open(self.filename, 'r') as f:
@@ -87,6 +87,12 @@ class Config(object):
     def _write(self, conf):
         with codecs.open(self.filename, 'w') as f:
             f.write(ruamel.yaml.round_trip_dump(conf))
+
+    def exists(self):
+        return os.path.isfile(self.filename)
+
+    def open(self):
+        self.config = self._read()
 
     def all(self):
         return self.config.keys()

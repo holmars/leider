@@ -11,6 +11,11 @@ A cli to manage services for apps in `Docker` for local development.
 - Manages services in `Docker`.
 - Exports connection URLs for your app.
 
+### What is this good for?
+
+- You don't have a Dockerized app (so `docker-compose` is not an option). Think `Heroku`, etc.
+- You have some apps that need older versions of `PostgreSQL`, etc.
+
 ## Installation
 
 ```

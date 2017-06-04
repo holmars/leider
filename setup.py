@@ -17,7 +17,7 @@ setup(
         'click',
         'crayons',
         'docker',
-        'ruamel.yaml',
+        'ruamel.yaml<0.15',
     ],
     license='MIT',
     classifiers=[

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 
+from docker.errors import NotFound
+
 from .docker_utils import client, get_exposed_port
 
 
@@ -22,7 +24,10 @@ class Service(object):
     @property
     def container(self):
         if self.id is not None and self._container is None:
-            self._container = client.containers.get(self.id)
+            try:
+                self._container = client.containers.get(self.id)
+            except NotFound:
+                self._container = None
         return self._container
 
     @property
@@ -58,6 +63,11 @@ class Service(object):
     def down(self):
         if self.container:
             self.container.stop()
+        self._container = None
+
+    def remove(self):
+        if self.container:
+            self.container.remove(force=True)
         self._container = None
 
 

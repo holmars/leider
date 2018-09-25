@@ -8,7 +8,6 @@ from .config import Config, InternalConfig
 from .docker_utils import ensure_image_has_tag
 from .services import ServiceTypes
 
-
 internal_config = InternalConfig()
 config = Config()
 
@@ -97,9 +96,14 @@ def cli():
     ensure_config_is_valid(config)
 
 
-@click.command(help="Starts all or provided services. Prints out connection URLs.")
+@click.command()
 @click.argument("service_names", nargs=-1)
 def up(service_names):
+    """
+    Starts all or provided services.
+
+    Prints out connection URLs.
+    """
     ensure_services_exist_in_config(config, service_names)
     service_names = service_names or config.all()
     for service_name in service_names:
@@ -109,9 +113,12 @@ def up(service_names):
         internal_config.add_or_update(service)
 
 
-@click.command(help="Stops all or provided services.")
+@click.command()
 @click.argument("service_names", nargs=-1)
 def down(service_names):
+    """
+    Stops all or provided services.
+    """
     ensure_services_exist_in_config(config, service_names)
     service_names = service_names or config.all()
     for service_name in service_names:
@@ -121,14 +128,35 @@ def down(service_names):
         internal_config.add_or_update(service)
 
 
-@click.command(help="Prints out the status of all services.")
+@click.command()
 def status():
+    """
+    Prints out the status of all services.
+    """
     service_names = config.all()
     for service_name in service_names:
         service = init_service(service_name)
         click.echo("{}: {}".format(service_name, service.status))
 
 
+@click.command()
+@click.argument("service_names", nargs=-1)
+def reset(service_names):
+    """
+    Reset all or provided services.
+
+    Stops and removes the docker container.
+    """
+    ensure_services_exist_in_config(config, service_names)
+    service_names = service_names or config.all()
+    for service_name in service_names:
+        service = init_service(service_name)
+        service.remove()
+        internal_config.remove(service_name)
+        click.echo("{}: {}".format(service_name, "removed"))
+
+
 cli.add_command(up)
 cli.add_command(down)
 cli.add_command(status)
+cli.add_command(reset)

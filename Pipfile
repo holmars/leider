@@ -5,6 +5,7 @@ name = "pypi"
 
 [dev-packages]
 leider = {editable = true, path = "."}
+isort = "*"
 
 [packages]
 click = "*"

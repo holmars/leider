@@ -71,6 +71,11 @@ class InternalConfig(object):
         self._ensure_services_key_exists()
         return self.config["services"].get(service_name, CommentedMap([]))
 
+    def remove(self, service_name):
+        self._ensure_services_key_exists()
+        del self.config["services"][service_name]
+        self._write()
+
 
 class Config(object):
     filename = "leider.yaml"

@@ -56,6 +56,7 @@ Options:
 
 Commands:
   down    Stops all or provided services.
+  reset   Reset all or provided services.
   status  Prints out the status of all services.
   up      Starts all or provided services.
 ```

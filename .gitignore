@@ -3,3 +3,5 @@
 *.cfg
 dist
 build
+.vscode
+Pipfile.lock

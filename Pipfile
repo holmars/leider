@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+leider = {editable = true, path = "."}
+
+[packages]
+click = "*"
+crayons = "*"
+docker = "*"
+"ruamel.yaml" = "<0.15"
+
+[requires]
+python_version = "2.7"

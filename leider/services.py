@@ -15,8 +15,8 @@ class Service(object):
         self._short_id = None
 
         self.name = name
-        self.id = config.get('id', None)
-        self.host = 'localhost'
+        self.id = config.get("id", None)
+        self.host = "localhost"
         self.image = image
 
     @property
@@ -33,7 +33,7 @@ class Service(object):
 
     @property
     def port(self):
-        if self.status == 'running':
+        if self.status == "running":
             self._port = get_exposed_port(self.attrs, self.internal_port)
         return self._port
 
@@ -41,10 +41,10 @@ class Service(object):
     def status(self):
         if self.container:
             return self.container.status
-        return 'does not exist'
+        return "does not exist"
 
     def config_fields(self):
-        return ('image', 'id', 'host', 'port')
+        return ("image", "id", "host", "port")
 
     def up(self):
         container = self.container
@@ -66,13 +66,13 @@ class PostgreSQL(Service):
 
     def __init__(self, name, image, config):
         super(PostgreSQL, self).__init__(name, image, config)
-        self.db_name = config.get('db_name', os.getcwd().split(os.sep)[-1])
-        self.db_user = config.get('db_user', self.db_name)
-        self.db_pass = config.get('db_pass', os.urandom(8).encode('hex'))
+        self.db_name = config.get("db_name", os.getcwd().split(os.sep)[-1])
+        self.db_user = config.get("db_user", self.db_name)
+        self.db_pass = config.get("db_pass", os.urandom(8).encode("hex"))
 
     def config_fields(self):
         base_fields = super(PostgreSQL, self).config_fields()
-        return base_fields + ('db_name', 'db_user', 'db_pass')
+        return base_fields + ("db_name", "db_user", "db_pass")
 
     def run(self):
         container = client.containers.run(
@@ -80,16 +80,16 @@ class PostgreSQL(Service):
             detach=True,
             publish_all_ports=True,
             environment={
-                'POSTGRES_DB': self.db_name,
-                'POSTGRES_USER': self.db_user,
-                'POSTGRES_PASSWORD': self.db_pass,
+                "POSTGRES_DB": self.db_name,
+                "POSTGRES_USER": self.db_user,
+                "POSTGRES_PASSWORD": self.db_pass,
             },
         )
         return container
 
     @property
     def url(self):
-        return 'postgresql://{user}:{pswd}@{host}:{port}/{name}'.format(
+        return "postgresql://{user}:{pswd}@{host}:{port}/{name}".format(
             host=self.host,
             port=self.port,
             name=self.db_name,
@@ -103,26 +103,22 @@ class Redis(Service):
 
     def __init__(self, name, image, config):
         super(Redis, self).__init__(name, image, config)
-        self.redis_db = config.get('redis_db', 0)
+        self.redis_db = config.get("redis_db", 0)
 
     def config_fields(self):
         base_fields = super(Redis, self).config_fields()
-        return base_fields + ('redis_db', )
+        return base_fields + ("redis_db",)
 
     def run(self):
         container = client.containers.run(
-            image=self.image,
-            detach=True,
-            publish_all_ports=True,
+            image=self.image, detach=True, publish_all_ports=True
         )
         return container
 
     @property
     def url(self):
-        return 'redis://{host}:{port}/{db}'.format(
-            host=self.host,
-            port=self.port,
-            db=self.redis_db,
+        return "redis://{host}:{port}/{db}".format(
+            host=self.host, port=self.port, db=self.redis_db
         )
 
 
@@ -134,18 +130,13 @@ class Memcached(Service):
 
     def run(self):
         container = client.containers.run(
-            image=self.image,
-            detach=True,
-            publish_all_ports=True,
+            image=self.image, detach=True, publish_all_ports=True
         )
         return container
 
     @property
     def url(self):
-        return 'memcached://{host}:{port}'.format(
-            host=self.host,
-            port=self.port,
-        )
+        return "memcached://{host}:{port}".format(host=self.host, port=self.port)
 
 
 class RabbitMQ(Service):
@@ -153,13 +144,13 @@ class RabbitMQ(Service):
 
     def __init__(self, name, image, config):
         super(RabbitMQ, self).__init__(name, image, config)
-        self.queue_vhost = config.get('queue_vhost', os.getcwd().split(os.sep)[-1])
-        self.queue_user = config.get('queue_user', self.queue_vhost)
-        self.queue_pass = config.get('queue_pass', os.urandom(8).encode('hex'))
+        self.queue_vhost = config.get("queue_vhost", os.getcwd().split(os.sep)[-1])
+        self.queue_user = config.get("queue_user", self.queue_vhost)
+        self.queue_pass = config.get("queue_pass", os.urandom(8).encode("hex"))
 
     def config_fields(self):
         base_fields = super(RabbitMQ, self).config_fields()
-        return base_fields + ('queue_vhost', 'queue_user', 'queue_pass')
+        return base_fields + ("queue_vhost", "queue_user", "queue_pass")
 
     def run(self):
         container = client.containers.run(
@@ -167,16 +158,16 @@ class RabbitMQ(Service):
             detach=True,
             publish_all_ports=True,
             environment={
-                'RABBITMQ_DEFAULT_VHOST': self.queue_vhost,
-                'RABBITMQ_DEFAULT_USER': self.queue_user,
-                'RABBITMQ_DEFAULT_PASS': self.queue_pass,
+                "RABBITMQ_DEFAULT_VHOST": self.queue_vhost,
+                "RABBITMQ_DEFAULT_USER": self.queue_user,
+                "RABBITMQ_DEFAULT_PASS": self.queue_pass,
             },
         )
         return container
 
     @property
     def url(self):
-        return 'amqp://{user}:{pswd}@{host}:{port}/{vhost}'.format(
+        return "amqp://{user}:{pswd}@{host}:{port}/{vhost}".format(
             host=self.host,
             port=self.port,
             vhost=self.queue_vhost,
@@ -186,8 +177,8 @@ class RabbitMQ(Service):
 
 
 ServiceTypes = {
-    'postgres': PostgreSQL,
-    'redis': Redis,
-    'memcached': Memcached,
-    'rabbitmq': RabbitMQ,
+    "postgres": PostgreSQL,
+    "redis": Redis,
+    "memcached": Memcached,
+    "rabbitmq": RabbitMQ,
 }

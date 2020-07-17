@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
+import codecs
 import os
 
 from docker.errors import NotFound
 
 from .docker_utils import client, get_exposed_port
+
+
+def generate_password(length=8):
+    return codecs.encode(os.urandom(length), "hex").decode("utf-8")
 
 
 class Service(object):
@@ -78,7 +83,7 @@ class PostgreSQL(Service):
         super(PostgreSQL, self).__init__(name, image, config)
         self.db_name = config.get("db_name", os.getcwd().split(os.sep)[-1])
         self.db_user = config.get("db_user", self.db_name)
-        self.db_pass = config.get("db_pass", os.urandom(8).encode("hex"))
+        self.db_pass = config.get("db_pass", generate_password())
 
     def config_fields(self):
         base_fields = super(PostgreSQL, self).config_fields()
@@ -156,7 +161,7 @@ class RabbitMQ(Service):
         super(RabbitMQ, self).__init__(name, image, config)
         self.queue_vhost = config.get("queue_vhost", os.getcwd().split(os.sep)[-1])
         self.queue_user = config.get("queue_user", self.queue_vhost)
-        self.queue_pass = config.get("queue_pass", os.urandom(8).encode("hex"))
+        self.queue_pass = config.get("queue_pass", generate_password())
 
     def config_fields(self):
         base_fields = super(RabbitMQ, self).config_fields()

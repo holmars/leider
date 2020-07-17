@@ -5,13 +5,11 @@ name = "pypi"
 
 [dev-packages]
 leider = {editable = true, path = "."}
-isort = "*"
 
 [packages]
 click = "*"
 crayons = "*"
 docker = "*"
-"ruamel.yaml" = "<0.15"
 
 [requires]
-python_version = "2.7"
+python_version = "3.8"

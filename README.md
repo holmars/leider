@@ -25,7 +25,7 @@ $ pip install leider
 or
 
 ```
-$ pipsi install leider
+$ pipx install leider
 ```
 
 ## Usage
